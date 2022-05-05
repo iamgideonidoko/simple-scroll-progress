@@ -49,6 +49,24 @@ class Simple_Scroll_Progress {
 	protected $plugin_name;
 
 	/**
+	 * The real name of this plugin.
+	 *
+	 * @since    1.0.0
+	 * @access   protected
+	 * @var      string    $plugin_name    The string used to uniquely identify this plugin.
+	 */
+	protected $actual_name;
+
+	/**
+	 * The prefix for this plugin.
+	 *
+	 * @since    1.0.0
+	 * @access   protected
+	 * @var      string    $plugin_name    The string used to uniquely identify this plugin.
+	 */
+	protected $plugin_prefix;
+
+	/**
 	 * The current version of the plugin.
 	 *
 	 * @since    1.0.0
@@ -73,6 +91,8 @@ class Simple_Scroll_Progress {
 			$this->version = '1.0.0';
 		}
 		$this->plugin_name = 'simple-scroll-progress';
+		$this->actual_name = 'Simple Scroll Progress';
+		$this->plugin_prefix = 'simple_scroll_progress';
 
 		$this->load_dependencies();
 		$this->set_locale();
@@ -152,10 +172,11 @@ class Simple_Scroll_Progress {
 	 */
 	private function define_admin_hooks() {
 
-		$plugin_admin = new Simple_Scroll_Progress_Admin( $this->get_plugin_name(), $this->get_version() );
+		$plugin_admin = new Simple_Scroll_Progress_Admin( $this->get_plugin_name(), $this->get_version(), $this->get_actual_name(), $this->get_plugin_prefix() );
 
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
+		$this->loader->add_action( 'admin_menu', $plugin_admin, 'add_sublevel_menu' );
 
 	}
 
@@ -193,6 +214,26 @@ class Simple_Scroll_Progress {
 	 */
 	public function get_plugin_name() {
 		return $this->plugin_name;
+	}
+
+	/**
+	 * The actual name of the plugin.
+	 *
+	 * @since     1.0.0
+	 * @return    string    The name of the plugin.
+	 */
+	public function get_actual_name() {
+		return $this->actual_name;
+	}
+
+	/**
+	 * The name prefix of the plugin.
+	 *
+	 * @since     1.0.0
+	 * @return    string    The name of the plugin.
+	 */
+	public function get_plugin_prefix() {
+		return $this->plugin_prefix;
 	}
 
 	/**

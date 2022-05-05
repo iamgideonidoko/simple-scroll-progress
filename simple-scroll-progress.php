@@ -14,8 +14,8 @@
  *
  * @wordpress-plugin
  * Plugin Name:       Simple Scroll Progress
- * Plugin URI:        https://gideonidoko.com
- * Description:       This is a short description of what the plugin does. It's displayed in the WordPress admin area.
+ * Plugin URI:        https://gideonidoko.com/blog/build-a-customizable-scroll-progress-wordpress-plugin
+ * Description:       Simple Scroll Progress adds a highly customizable scroll progress plugin to your WordPress site.
  * Version:           1.0.0
  * Author:            Gideon Idoko
  * Author URI:        https://gideonidoko.com/about

@@ -95,9 +95,9 @@ class Simple_Scroll_Progress_Public {
 		 * between the defined hooks and the functions defined in this
 		 * class.
 		 */
-
-		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/simple-scroll-progress-public.js', array( 'jquery' ), $this->version, false );
-
+		
+		wp_enqueue_script($this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/simple-scroll-progress-public.js', array( 'jquery' ), $this->version, true );
+		wp_add_inline_script($this->plugin_name, "_075a97e0_5a16_4b1f_9288_a4aa951951bfce_('James')", 'after');
 	}
 
 }
