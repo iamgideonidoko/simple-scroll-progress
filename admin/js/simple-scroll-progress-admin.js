@@ -1,8 +1,6 @@
 (function( $ ) {
 	'use strict';
-
-	console.log('From admin specific side');
-
+	
 	/**
 	 * All of the code for your admin-facing JavaScript source
 	 * should reside in this file.

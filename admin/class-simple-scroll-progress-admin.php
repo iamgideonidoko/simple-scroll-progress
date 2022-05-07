@@ -129,6 +129,7 @@ class Simple_Scroll_Progress_Admin {
 
 		 // check if user is allowed access
 		if ( ! current_user_can( 'manage_options' ) ) return;
+		// settings_errors();
 		?>
 		<div class="wrap">
 			<!-- Page -->
@@ -136,9 +137,9 @@ class Simple_Scroll_Progress_Admin {
 			<form action="options.php" method="post">
 			<?php
 			// output security fields
-			settings_fields( 'myplugin_options' );
+			settings_fields( $this->plugin_prefix.'_options' );
 			// output setting sections
-			do_settings_sections( 'myplugin' );
+			do_settings_sections( $this->plugin_name );
 			// submit button
 			submit_button();
 			?>
@@ -175,9 +176,35 @@ class Simple_Scroll_Progress_Admin {
 	 */
 	public function validate_options($input) {
 
-		wp_die('validate options => ', $input);
+		// validate color
+		if ( isset($input['color']) ) {
+			$input['color'] = sanitize_hex_color($input['color']);
+		} else {
+			$input['color'] = $this->options_default()['color'];
+		}
 
-	
+		// validate height
+		if ( isset($input['height']) ) {
+			$input['height'] = absint(sanitize_text_field($input['height']));
+		} else {
+			$input['height'] = $this->options_default()['height'];
+		}
+
+		// validate height
+		if ( isset($input['zindex']) ) {
+			$input['zindex'] = absint(sanitize_text_field($input['zindex']));
+		} else {
+			$input['zindex'] = $this->options_default()['zindex'];
+		}
+
+		// validate height
+		if ( isset($input['cap']) ) {
+			if ( ! array_key_exists( $input['cap'], $this->cap_list() ) ) {
+				$input['cap'] = $this->options_default()['cap'];
+			} 
+		} else {
+			$input['cap'] = $this->options_default()['cap'];
+		}
 
 		return $input;
 		
@@ -194,11 +221,170 @@ class Simple_Scroll_Progress_Admin {
 		register_setting(
 			$this->plugin_prefix.'_options',
 			$this->plugin_prefix.'_options',
-			array( $this, 'validate_options' ) 
+			array(
+				'sanitize_callback' => array( $this, 'validate_options' )
+			)			 
+		);
+		
+		add_settings_section(
+			'default',
+			'Customize Scroll Progress Bar',
+			array($this, 'default_section_callback'),
+			$this->plugin_name
+		);
+
+		add_settings_field(
+			'color',
+			'Color',
+			array($this, 'color_callback'),
+			$this->plugin_name,
+			'default',
+			[ 'id' => 'color', 'label' => 'Default: '. $this->options_default()['color'] ]
+		);
+
+		add_settings_field(
+			'height',
+			'Height',
+			array($this, 'height_callback'),
+			$this->plugin_name,
+			'default',
+			[ 'id' => 'height', 'label' => 'Default: '. $this->options_default()['height'] . ' (px)' ]
+		);
+
+		add_settings_field(
+			'zindex',
+			'Z Index',
+			array($this, 'zindex_callback'),
+			$this->plugin_name,
+			'default',
+			[ 'id' => 'zindex', 'label' => 'Default: '. $this->options_default()['zindex'] ]
+		);
+
+		add_settings_field(
+			'cap',
+			'Cap',
+			array($this, 'cap_callback'),
+			$this->plugin_name,
+			'default',
+			[ 'id' => 'cap', 'label' => 'Default: '. $this->cap_list()[$this->options_default()['cap']] ]
 		);
 		
 	}
 
-	
+	/**
+	 * add settings section callback
+	 *
+	 * @since    1.0.0
+	 */
+	public function default_section_callback() {
+
+	}
+
+	/**
+	 * Add color option callback
+	 *
+	 * @since    1.0.0
+	 */
+	public function color_callback($args) {
+
+		$id    = isset( $args['id'] )    ? $args['id']    : '';
+		$label = isset( $args['label'] ) ? $args['label'] : '';
+
+		$options = get_option( $this->plugin_prefix.'_options', $this->options_default() );
+		$value = isset( $options[$id] ) ? sanitize_text_field( $options[$id] ) : $this->options_default()[$id];
+
+		echo '<input type="color" required id="'. $this->plugin_prefix.'_options_'.$id .'" name="'. $this->plugin_prefix.'_options['.$id .']"
+		value="'. $value .'">';
+		echo '<br>';
+		echo '<label style="margin-top: 0.4rem; display: inline-block;" for="'. $this->plugin_prefix.'_options_'.$id .'">'. $label .'</label>';
+		
+	}
+
+	/**
+	 * Add height option callback
+	 *
+	 * @since    1.0.0
+	 */
+	public function height_callback($args) {
+
+		$id    = isset( $args['id'] )    ? $args['id']    : '';
+		$label = isset( $args['label'] ) ? $args['label'] : '';
+
+		$options = get_option( $this->plugin_prefix.'_options', $this->options_default() );
+		$value = isset( $options[$id] ) ? sanitize_text_field( $options[$id] ) : $this->options_default()[$id];
+
+		echo '<input type="number" required min="0" id="'. $this->plugin_prefix.'_options_'.$id .'" name="'. $this->plugin_prefix.'_options['.$id .']"
+		value="'. $value .'">';
+		echo '<br>';
+		echo '<label style="margin-top: 0.4rem; display: inline-block;" for="'. $this->plugin_prefix.'_options_'.$id .'">'. $label .'</label>';
+		
+	}
+
+	/**
+	 * Add zindex option callback
+	 *
+	 * @since    1.0.0
+	 */
+	public function zindex_callback($args) {
+
+		
+		$id    = isset( $args['id'] )    ? $args['id']    : '';
+		$label = isset( $args['label'] ) ? $args['label'] : '';
+		
+		$options = get_option( $this->plugin_prefix.'_options', $this->options_default() );
+		$value = isset( $options[$id] ) ? sanitize_text_field( $options[$id] ) : $this->options_default()[$id];
+		
+		echo '<input type="number" required min="0" id="'. $this->plugin_prefix.'_options_'.$id .'" name="'. $this->plugin_prefix.'_options['.$id .']"
+		value="'. $value .'">';
+		echo '<br>';
+		echo '<label style="margin-top: 0.4rem; display: inline-block;" for="'. $this->plugin_prefix.'_options_'.$id .'">'. $label .'</label>';
+	}
+
+	/**
+	 * add settings section callback
+	 *
+	 * @since    1.0.0
+	 */
+	public function cap_callback($args) {
+
+		$id    = isset( $args['id'] )    ? $args['id']    : '';
+		$label = isset( $args['label'] ) ? $args['label'] : '';
+		
+		$options = get_option( $this->plugin_prefix.'_options', $this->options_default() );
+		$value = isset( $options[$id] ) ? sanitize_text_field( $options[$id] ) : $this->options_default()[$id];
+
+		$select_options = $this->cap_list();
+
+		echo '<select required type="number" min="0" id="'. $this->plugin_prefix.'_options_'.$id .'" name="'. $this->plugin_prefix.'_options['.$id .']"
+		value="'. $value .'">';
+		foreach ($select_options as $val => $option) {
+			echo '<option value="'. $val .'"'. ($val == $value ? 'selected' : '') .'>'. $option .'</option>';
+		}
+		echo '</select>';
+		echo '<br>';
+		echo '<label style="margin-top: 0.4rem; display: inline-block;" for="'. $this->plugin_prefix.'_options_'.$id .'">'. $label .'</label>';
+		
+	}
+
+	/**
+	 * get default options
+	 *
+	 * @since    1.0.0
+	*/
+	public function options_default() {
+		return array(
+			'color' => '#22c1c3',
+			'height' => 10,
+			'zindex' => 9999999,
+			'cap' => 'curve'
+		);
+	}
+
+	public function cap_list() {
+		return array(
+			'square' => 'Square',
+			'curve' => 'Curve'
+		);
+	}
 
 }
