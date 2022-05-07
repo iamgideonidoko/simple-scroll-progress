@@ -1,8 +1,10 @@
-function _075a97e0_5a16_4b1f_9288_a4aa951951bfce_(name) {
+function _075a97e0_5a16_4b1f_9288_a4aa951951bfce_(payload) {
 	// initialize scroll progress bar only once
 
-	console.log("name => ", name);
+	// check if payload is a valid one
+	if (!typeof payload === 'object' || !payload.hasOwnProperty('color') || !payload.hasOwnProperty('height') || !payload.hasOwnProperty('zindex') || !payload.hasOwnProperty('cap')) return;
 
+	const { color, height, zindex, cap } = payload;
 
 	if (window._d60589dc_245b_4497_b8f6_a505a85568bf_) return;
 
@@ -23,16 +25,15 @@ function _075a97e0_5a16_4b1f_9288_a4aa951951bfce_(name) {
 		position: fixed;
 		top: 0;
 		left: 0;
-		height: 10px;
-		background-color: #f90a23;
-		height: 10px;
+		height: ${height}px;
+		background-color: ${color};
 		transition: 0.1s ease width;
-		z-index: 9999999;
-		border-radius: 10rem;
+		z-index: ${zindex};
+		border-top-right-radius: ${cap === 'curve' ? '100rem' : 0};
+		border-bottom-right-radius: ${cap === 'curve' ? '100rem' : 0};
 	`;
 
 	var scrollLine = createNodeFromHtmlString(`<div class="scroll-line" style="${simple_scroll_progress_css}"></div>`);
-	// scrollLine.classList.add('scroll-line');
 
 	function fillScrollLine() {
 		const windowHeight = window.innerHeight;
@@ -42,7 +43,7 @@ function _075a97e0_5a16_4b1f_9288_a4aa951951bfce_(name) {
 
 		scrollLine.style.width = `${percentScrolled}%`;
 	}
-	
+
 	/**
 	 *
 	 *
@@ -71,5 +72,6 @@ function _075a97e0_5a16_4b1f_9288_a4aa951951bfce_(name) {
 
 	window.document.body.appendChild(scrollLine);
 
+	// so it doesn't get called twice
 	window._d60589dc_245b_4497_b8f6_a505a85568bf_ = true;
 }

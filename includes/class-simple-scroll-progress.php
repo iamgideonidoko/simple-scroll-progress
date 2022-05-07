@@ -67,6 +67,15 @@ class Simple_Scroll_Progress {
 	protected $plugin_prefix;
 
 	/**
+	 * The prefix for this plugin.
+	 *
+	 * @since    1.0.0
+	 * @access   protected
+	 * @var      string    $plugin_name    The string used to uniquely identify this plugin.
+	 */
+	protected $plugin_options_default;
+
+	/**
 	 * The current version of the plugin.
 	 *
 	 * @since    1.0.0
@@ -93,6 +102,12 @@ class Simple_Scroll_Progress {
 		$this->plugin_name = 'simple-scroll-progress';
 		$this->actual_name = 'Simple Scroll Progress';
 		$this->plugin_prefix = 'simple_scroll_progress';
+		$this->plugin_options_default = array(
+			'color' => '#22c1c3',
+			'height' => 10,
+			'zindex' => 9999999,
+			'cap' => 'curve'
+		);;
 
 		$this->load_dependencies();
 		$this->set_locale();
@@ -172,7 +187,7 @@ class Simple_Scroll_Progress {
 	 */
 	private function define_admin_hooks() {
 
-		$plugin_admin = new Simple_Scroll_Progress_Admin( $this->get_plugin_name(), $this->get_version(), $this->get_actual_name(), $this->get_plugin_prefix() );
+		$plugin_admin = new Simple_Scroll_Progress_Admin( $this->get_plugin_name(), $this->get_version(), $this->get_plugin_prefix(), $this->get_options_default(), $this->get_actual_name() );
 
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
@@ -190,7 +205,7 @@ class Simple_Scroll_Progress {
 	 */
 	private function define_public_hooks() {
 
-		$plugin_public = new Simple_Scroll_Progress_Public( $this->get_plugin_name(), $this->get_version() );
+		$plugin_public = new Simple_Scroll_Progress_Public( $this->get_plugin_name(), $this->get_version(), $this->get_plugin_prefix(), $this->get_options_default() );
 
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
@@ -235,6 +250,16 @@ class Simple_Scroll_Progress {
 	 */
 	public function get_plugin_prefix() {
 		return $this->plugin_prefix;
+	}
+
+	/**
+	 *
+	 *
+	 * @since    1.0.0
+	 * @return    array    The default options of the plugin.
+	*/
+	public function get_options_default() {
+		return $this->plugin_options_default;
 	}
 
 	/**

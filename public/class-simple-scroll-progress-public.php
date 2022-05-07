@@ -41,16 +41,37 @@ class Simple_Scroll_Progress_Public {
 	private $version;
 
 	/**
+	 * The name of this plugin.
+	 *
+	 * @since    1.0.0
+	 * @access   private
+	 * @var      string    $plugin_prefix    The name prefix of this plugin.
+	 */
+	private $plugin_prefix;
+
+	/**
+	 * The options of this plugin.
+	 *
+	 * @since    1.0.0
+	 * @access   private
+	 * @var      string    $plugin_name    The ID of this plugin.
+	 */
+	private $plugin_options_default;
+
+
+	/**
 	 * Initialize the class and set its properties.
 	 *
 	 * @since    1.0.0
 	 * @param      string    $plugin_name       The name of the plugin.
 	 * @param      string    $version    The version of this plugin.
 	 */
-	public function __construct( $plugin_name, $version ) {
+	public function __construct( $plugin_name, $version, $plugin_prefix, $plugin_options_default ) {
 
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
+		$this->plugin_prefix = $plugin_prefix;
+		$this->plugin_options_default = $plugin_options_default;
 
 	}
 
@@ -95,9 +116,11 @@ class Simple_Scroll_Progress_Public {
 		 * between the defined hooks and the functions defined in this
 		 * class.
 		 */
+
+		$options = get_option( $this->plugin_prefix.'_options', $this->plugin_options_default );
 		
 		wp_enqueue_script($this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/simple-scroll-progress-public.js', array( 'jquery' ), $this->version, true );
-		wp_add_inline_script($this->plugin_name, "_075a97e0_5a16_4b1f_9288_a4aa951951bfce_('James')", 'after');
+		wp_add_inline_script($this->plugin_name, "_075a97e0_5a16_4b1f_9288_a4aa951951bfce_(". json_encode($options) .")", 'after');
 	}
 
 }

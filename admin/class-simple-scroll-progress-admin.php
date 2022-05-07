@@ -32,24 +32,6 @@ class Simple_Scroll_Progress_Admin {
 	private $plugin_name;
 
 	/**
-	 * The name of this plugin.
-	 *
-	 * @since    1.0.0
-	 * @access   private
-	 * @var      string    $actual_name    The actual name of this plugin.
-	 */
-	private $actual_name;
-
-	/**
-	 * The name of this plugin.
-	 *
-	 * @since    1.0.0
-	 * @access   private
-	 * @var      string    $plugin_prefix    The name prefix of this plugin.
-	 */
-	private $plugin_prefix;
-
-	/**
 	 * The version of this plugin.
 	 *
 	 * @since    1.0.0
@@ -59,18 +41,47 @@ class Simple_Scroll_Progress_Admin {
 	private $version;
 
 	/**
+	 * The options of this plugin.
+	 *
+	 * @since    1.0.0
+	 * @access   private
+	 * @var      string    $plugin_name    The ID of this plugin.
+	 */
+	private $plugin_options_default;
+
+	/**
+	 * The name of this plugin.
+	 *
+	 * @since    1.0.0
+	 * @access   private
+	 * @var      string    $plugin_prefix    The name prefix of this plugin.
+	 */
+	private $plugin_prefix;
+	
+
+	/**
+	 * The name of this plugin.
+	 *
+	 * @since    1.0.0
+	 * @access   private
+	 * @var      string    $actual_name    The actual name of this plugin.
+	 */
+	private $actual_name;
+
+	/**
 	 * Initialize the class and set its properties.
 	 *
 	 * @since    1.0.0
 	 * @param      string    $plugin_name       The name of this plugin.
 	 * @param      string    $version    The version of this plugin.
 	 */
-	public function __construct( $plugin_name, $version, $actual_name, $plugin_prefix ) {
+	public function __construct( $plugin_name, $version, $plugin_prefix, $plugin_options_default, $actual_name ) {
 
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
-		$this->actual_name = $actual_name;
 		$this->plugin_prefix = $plugin_prefix;
+		$this->plugin_options_default = $plugin_options_default;
+		$this->actual_name = $actual_name;
 
 	}
 
@@ -180,30 +191,30 @@ class Simple_Scroll_Progress_Admin {
 		if ( isset($input['color']) ) {
 			$input['color'] = sanitize_hex_color($input['color']);
 		} else {
-			$input['color'] = $this->options_default()['color'];
+			$input['color'] = $this->plugin_options_default['color'];
 		}
 
 		// validate height
 		if ( isset($input['height']) ) {
 			$input['height'] = absint(sanitize_text_field($input['height']));
 		} else {
-			$input['height'] = $this->options_default()['height'];
+			$input['height'] = $this->plugin_options_default['height'];
 		}
 
 		// validate height
 		if ( isset($input['zindex']) ) {
 			$input['zindex'] = absint(sanitize_text_field($input['zindex']));
 		} else {
-			$input['zindex'] = $this->options_default()['zindex'];
+			$input['zindex'] = $this->plugin_options_default['zindex'];
 		}
 
 		// validate height
 		if ( isset($input['cap']) ) {
 			if ( ! array_key_exists( $input['cap'], $this->cap_list() ) ) {
-				$input['cap'] = $this->options_default()['cap'];
+				$input['cap'] = $this->plugin_options_default['cap'];
 			} 
 		} else {
-			$input['cap'] = $this->options_default()['cap'];
+			$input['cap'] = $this->plugin_options_default['cap'];
 		}
 
 		return $input;
@@ -239,7 +250,7 @@ class Simple_Scroll_Progress_Admin {
 			array($this, 'color_callback'),
 			$this->plugin_name,
 			'default',
-			[ 'id' => 'color', 'label' => 'Default: '. $this->options_default()['color'] ]
+			[ 'id' => 'color', 'label' => 'Default: '. $this->plugin_options_default['color'] ]
 		);
 
 		add_settings_field(
@@ -248,7 +259,7 @@ class Simple_Scroll_Progress_Admin {
 			array($this, 'height_callback'),
 			$this->plugin_name,
 			'default',
-			[ 'id' => 'height', 'label' => 'Default: '. $this->options_default()['height'] . ' (px)' ]
+			[ 'id' => 'height', 'label' => 'Default: '. $this->plugin_options_default['height'] . ' (px)' ]
 		);
 
 		add_settings_field(
@@ -257,7 +268,7 @@ class Simple_Scroll_Progress_Admin {
 			array($this, 'zindex_callback'),
 			$this->plugin_name,
 			'default',
-			[ 'id' => 'zindex', 'label' => 'Default: '. $this->options_default()['zindex'] ]
+			[ 'id' => 'zindex', 'label' => 'Default: '. $this->plugin_options_default['zindex'] ]
 		);
 
 		add_settings_field(
@@ -266,7 +277,7 @@ class Simple_Scroll_Progress_Admin {
 			array($this, 'cap_callback'),
 			$this->plugin_name,
 			'default',
-			[ 'id' => 'cap', 'label' => 'Default: '. $this->cap_list()[$this->options_default()['cap']] ]
+			[ 'id' => 'cap', 'label' => 'Default: '. $this->cap_list()[$this->plugin_options_default['cap']] ]
 		);
 		
 	}
@@ -276,9 +287,7 @@ class Simple_Scroll_Progress_Admin {
 	 *
 	 * @since    1.0.0
 	 */
-	public function default_section_callback() {
-
-	}
+	public function default_section_callback() {}
 
 	/**
 	 * Add color option callback
@@ -290,8 +299,8 @@ class Simple_Scroll_Progress_Admin {
 		$id    = isset( $args['id'] )    ? $args['id']    : '';
 		$label = isset( $args['label'] ) ? $args['label'] : '';
 
-		$options = get_option( $this->plugin_prefix.'_options', $this->options_default() );
-		$value = isset( $options[$id] ) ? sanitize_text_field( $options[$id] ) : $this->options_default()[$id];
+		$options = get_option( $this->plugin_prefix.'_options', $this->plugin_options_default );
+		$value = isset( $options[$id] ) ? sanitize_text_field( $options[$id] ) : $this->plugin_options_default[$id];
 
 		echo '<input type="color" required id="'. $this->plugin_prefix.'_options_'.$id .'" name="'. $this->plugin_prefix.'_options['.$id .']"
 		value="'. $value .'">';
@@ -310,8 +319,8 @@ class Simple_Scroll_Progress_Admin {
 		$id    = isset( $args['id'] )    ? $args['id']    : '';
 		$label = isset( $args['label'] ) ? $args['label'] : '';
 
-		$options = get_option( $this->plugin_prefix.'_options', $this->options_default() );
-		$value = isset( $options[$id] ) ? sanitize_text_field( $options[$id] ) : $this->options_default()[$id];
+		$options = get_option( $this->plugin_prefix.'_options', $this->plugin_options_default );
+		$value = isset( $options[$id] ) ? sanitize_text_field( $options[$id] ) : $this->plugin_options_default[$id];
 
 		echo '<input type="number" required min="0" id="'. $this->plugin_prefix.'_options_'.$id .'" name="'. $this->plugin_prefix.'_options['.$id .']"
 		value="'. $value .'">';
@@ -331,8 +340,8 @@ class Simple_Scroll_Progress_Admin {
 		$id    = isset( $args['id'] )    ? $args['id']    : '';
 		$label = isset( $args['label'] ) ? $args['label'] : '';
 		
-		$options = get_option( $this->plugin_prefix.'_options', $this->options_default() );
-		$value = isset( $options[$id] ) ? sanitize_text_field( $options[$id] ) : $this->options_default()[$id];
+		$options = get_option( $this->plugin_prefix.'_options', $this->plugin_options_default );
+		$value = isset( $options[$id] ) ? sanitize_text_field( $options[$id] ) : $this->plugin_options_default[$id];
 		
 		echo '<input type="number" required min="0" id="'. $this->plugin_prefix.'_options_'.$id .'" name="'. $this->plugin_prefix.'_options['.$id .']"
 		value="'. $value .'">';
@@ -350,8 +359,8 @@ class Simple_Scroll_Progress_Admin {
 		$id    = isset( $args['id'] )    ? $args['id']    : '';
 		$label = isset( $args['label'] ) ? $args['label'] : '';
 		
-		$options = get_option( $this->plugin_prefix.'_options', $this->options_default() );
-		$value = isset( $options[$id] ) ? sanitize_text_field( $options[$id] ) : $this->options_default()[$id];
+		$options = get_option( $this->plugin_prefix.'_options', $this->plugin_options_default );
+		$value = isset( $options[$id] ) ? sanitize_text_field( $options[$id] ) : $this->plugin_options_default[$id];
 
 		$select_options = $this->cap_list();
 
@@ -364,20 +373,6 @@ class Simple_Scroll_Progress_Admin {
 		echo '<br>';
 		echo '<label style="margin-top: 0.4rem; display: inline-block;" for="'. $this->plugin_prefix.'_options_'.$id .'">'. $label .'</label>';
 		
-	}
-
-	/**
-	 * get default options
-	 *
-	 * @since    1.0.0
-	*/
-	public function options_default() {
-		return array(
-			'color' => '#22c1c3',
-			'height' => 10,
-			'zindex' => 9999999,
-			'cap' => 'curve'
-		);
 	}
 
 	public function cap_list() {
