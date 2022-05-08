@@ -29,3 +29,10 @@
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 	exit;
 }
+
+function simple_scroll_progress_uninstall() {
+	require_once plugin_dir_path( __FILE__ ) . 'includes/class-simple-scroll-progress.php';
+	$plugin = new Simple_Scroll_Progress();
+	$plugin->delete_plugin_options();
+}
+simple_scroll_progress_uninstall();

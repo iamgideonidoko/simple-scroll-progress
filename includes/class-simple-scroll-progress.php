@@ -282,4 +282,15 @@ class Simple_Scroll_Progress {
 		return $this->version;
 	}
 
+	/**
+	 * Remove plugin option from db
+	 *
+	 * @since     1.0.0
+	 * @return    string    uninstall .
+	 */
+	public function delete_plugin_options() {
+		// delete the plugin options
+		delete_option( $this->plugin_prefix.'_options' );
+	}
+
 }
